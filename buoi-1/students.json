@@ -1,0 +1,23 @@
+[
+    { 
+        "id":  1, 
+        "name": "Nguyen Van Be",
+        "age": 23, 
+        "gender": "Female",
+        "department": "History"
+    },
+    { 
+        "id":  2, 
+        "name": "Nguyen Van An",
+        "age": 19, 
+        "gender": "Female",
+        "department": "Maths"
+    },
+    { 
+        "id":  3, 
+        "name": "Nguyen Van Ce",
+        "age": 21, 
+        "gender": "Male",
+        "department": "History"
+    }
+]
