@@ -21,7 +21,7 @@ const writeFileStudents = async (data) => {
         await fs.promises.writeFile(path.resolve('./',"students.json"), JSON.stringify(data));
         return 'success !'
     } catch (err) {
-        throw(err)
+        throw(err.message)
     }
 }
 const addNewStudent = async (newStudent) => {
@@ -39,7 +39,7 @@ const addNewStudent = async (newStudent) => {
         lstStudent.push(newStudent);
         await writeFileStudents(lstStudent);
     } catch (err) {
-        throw(err)
+        throw(err.message)
     }
 }
 const findStudentById = (allStudent, idStudent) => allStudent.findIndex(({ id }) => id === idStudent)
@@ -65,21 +65,25 @@ const updateStudent = async (student) => {
         });
         await writeFileStudents(newStudent);
     } catch(err) {
-        throw(err)
+        throw(err.message)
     }
 }
 
 const deleteStudent = async (studentId) => {
-    if(!studentId) {
-        throw new Error('StudentId is empty found');
-    };
-    const allStudent = await getAllStudents();
-    const indexStudent = findStudentById(allStudent, studentId);
-    if (indexStudent === -1) {
-        throw new Error('StudentId not found');
+    try {
+        if(!studentId) {
+            throw new Error('StudentId is empty found');
+        };
+        const allStudent = await getAllStudents();
+        const indexStudent = findStudentById(allStudent, studentId);
+        if (indexStudent === -1) {
+            throw new Error('StudentId not found');
+        }
+        allStudent.splice(indexStudent, 1);
+        await writeFileStudents(allStudent);
+    }catch(err) {
+        throw(err.message)
     }
-    allStudent.splice(indexStudent, 1);
-    await writeFileStudents(allStudent);
 }
 
 //get all
