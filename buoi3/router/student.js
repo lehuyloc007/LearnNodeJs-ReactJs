@@ -26,6 +26,8 @@ const writeFileStudents = async (data) => {
 }
 const addNewStudent = async (newStudent) => {
     try {
+        console.log(newStudent)
+        if(!newStudent.name || !newStudent.age) throw new Error('Info Student is empty');
         if (!fs.existsSync(path.resolve('./',"students.json"))) {
             newStudent.id = uuid_v4.v4();
             const newData = [newStudent];
@@ -40,24 +42,44 @@ const addNewStudent = async (newStudent) => {
         throw(err)
     }
 }
-//const findStudentById = (allStudent, idStudent) => allStudent.find(({ id }) => id === idStudent)
+const findStudentById = (allStudent, idStudent) => allStudent.findIndex(({ id }) => id === idStudent)
 const updateStudent = async (student) => {
-    const { id: studentId, ... dataUpdateStudent} = student;
+    try {
+        const { id: studentId, ... dataUpdateStudent} = student;
+        if(!studentId) {
+            throw new Error('StudentId is empty found');
+        };
+        const allStudent = await getAllStudents();
+        const indexStudent = findStudentById(allStudent, studentId);
+        if (indexStudent === -1) {
+            throw new Error('StudentId not found');
+        }
+        const newStudent = allStudent.map(studentItem => {
+            if(studentItem.id === studentId) {
+                return {
+                    ...studentItem,
+                    ...dataUpdateStudent
+                }
+            }
+            return  studentItem;
+        });
+        await writeFileStudents(newStudent);
+    } catch(err) {
+        throw(err)
+    }
+}
+
+const deleteStudent = async (studentId) => {
     if(!studentId) {
-        throw new Error('User not found');
+        throw new Error('StudentId is empty found');
     };
     const allStudent = await getAllStudents();
-    const newStudent = allStudent.map(studentItem => {
-        if(studentItem.id === studentId) {
-            return {
-                ...studentItem,
-                ...dataUpdateStudent
-            }
-        }
-        return  studentItem;
-    });
-    await writeFileStudents(newStudent)
-    // findStudentById(allStudent, id);
+    const indexStudent = findStudentById(allStudent, studentId);
+    if (indexStudent === -1) {
+        throw new Error('StudentId not found');
+    }
+    allStudent.splice(indexStudent, 1);
+    await writeFileStudents(allStudent);
 }
 
 //get all
@@ -69,26 +91,29 @@ studentRouter.get('/all', (req, res) => {
 
 //add new
 studentRouter.post('/', (req, res)=>{
-    if (req.body.name && req.body.age) {
-        addNewStudent(req.body).then(data => {
-            res.send(data)
-        }).catch((err) => {
-            res.send(err)
-        })
-    } else {
-        res.send('not name or not age')
-    }
+    addNewStudent(req.body).then(data => {
+        res.send(data)
+    }).catch((err) => {
+        res.send(err)
+    })
 })
 
 //update
 studentRouter.post('/update', (req, res)=>{
-    if (req.body.id || (req.body.name && req.body.age)) {
-        updateStudent(req.body).then(data => {
-            res.send(data)
-        })
-    } else {
-        res.send('not name or not age')
-    }
+    updateStudent(req.body).then(data => {
+        res.send(data)
+    }).catch(err => {
+        res.send(err)
+    });
+})
+
+//delete
+studentRouter.post('/delete', (req, res)=>{
+    deleteStudent(req.body.id).then(data => {
+        res.send(data);
+    }).catch(err => {
+        res.send(err);
+    })
 })
 
 
