@@ -45,7 +45,7 @@ const addNewStudent = async (newStudent) => {
 const findStudentById = (allStudent, idStudent) => allStudent.findIndex(({ id }) => id === idStudent)
 const updateStudent = async (student) => {
     try {
-        const { id: studentId, ... dataUpdateStudent} = student;
+        const { id: studentId, ...dataUpdateStudent} = student;
         if(!studentId) {
             throw new Error('StudentId is empty found');
         };
